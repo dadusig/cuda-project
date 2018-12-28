@@ -95,8 +95,8 @@ int main(int argc, char *argv[])
 
 	cudaFree(A_d);
 	cudaFree(B_d);
-	free(A);
-	free(B);
+	free(A_h);
+	free(B_h);
 	fclose(output);
 
 	return 0;
