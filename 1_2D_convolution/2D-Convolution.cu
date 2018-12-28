@@ -93,11 +93,13 @@ int main(int argc, char *argv[])
 		fprintf(output, "%19.15f\n", B_h[i]);
 	}
 
-	cudaFree(A_d);
-	cudaFree(B_d);
 	free(A_h);
 	free(B_h);
 	fclose(output);
+
+	// free memory from device
+	cudaFree(A_d);
+	cudaFree(B_d);
 
 	return 0;
 }
