@@ -7,7 +7,7 @@
 #define NI 64 //4096
 #define NJ 64 //4096
 
-__global__ convolutionKernel(double *A_d, double *B_d)
+__global__ void convolutionKernel(double *A_d, double *B_d)
 {
 	// kernel code goes here
 }
@@ -54,7 +54,7 @@ int main(int argc, char *argv[])
 
 	double		*A_h;
 	double		*B_h;
-	struct timeval	cpu_start, cpu_end;
+	// struct timeval	cpu_start, cpu_end;
 
 	// create matrices in device
 	double *A_d, *B_d;
@@ -63,11 +63,11 @@ int main(int argc, char *argv[])
 	cudaMalloc((void**) &A_d, size);
 	cudaMalloc((void**) &B_d, size);
 
-	A = (double*)malloc(NI*NJ*sizeof(double));
-	B = (double*)malloc(NI*NJ*sizeof(double));
+	A_h = (double*)malloc(NI*NJ*sizeof(double));
+	B_h = (double*)malloc(NI*NJ*sizeof(double));
 
 	//initialize the arrays
-	init(A);
+	init(A_h);
 
 	// transfer matrix A to device
 	cudaMemcpy(A_d, A_h, size, cudaMemcpyHostToDevice);
@@ -90,7 +90,7 @@ int main(int argc, char *argv[])
 	// write results to file
 	for (int i = 0; i < NI*NJ; i++)
 	{
-		fprintf(output, "%19.15f\n", B[i]);
+		fprintf(output, "%19.15f\n", B_h[i]);
 	}
 
 	cudaFree(A_d);
