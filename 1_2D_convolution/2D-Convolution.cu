@@ -82,10 +82,10 @@ int main(int argc, char *argv[])
 	dim3 dimBlock(1,1);
 
 	// !!! call GPU kernel
-	convolutionKernel<<<dimGrid, dimBlock>>(A_d, B_d);
+	convolutionKernel<<<dimGrid, dimBlock>>>(A_d, B_d);
 
 	// transer matrix B from device to Host
-	cudaMemcpy(B_h, C_d, size, cudaMemcpyDeviceToHost);
+	cudaMemcpy(B_h, B_d, size, cudaMemcpyDeviceToHost);
 
 	// write results to file
 	for (int i = 0; i < NI*NJ; i++)
@@ -93,6 +93,8 @@ int main(int argc, char *argv[])
 		fprintf(output, "%19.15f\n", B[i]);
 	}
 
+	cudaFree(A_d);
+	cudaFree(B_d);
 	free(A);
 	free(B);
 	fclose(output);
