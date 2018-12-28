@@ -4,12 +4,23 @@
 #include <sys/time.h>
 
 /* Problem size */
-#define NI 64 //4096
-#define NJ 64 //4096
+#define NI 64 //4096 // height
+#define NJ 64 //4096 // width
 
-__global__ void convolutionKernel(double *A_d, double *B_d)
+__global__ void convolutionKernel(double *A_d, double *B_d, int width, int height)
 {
-	// kernel code goes here
+	int x = blockIdx.x * blockDim.x + threadIdx.x;
+	int y = blockIdx.y * blockDim.y + threadIdx.y;
+
+	if ( (x < width) && (y < height) )
+	{
+		// printf("block(%d, %d) tid:(%d, %d) in original(%d, %d): proccessing element %d\n", blockIdx.x, blockIdx.y, threadIdx.x, threadIdx.x, x, y, y*width+x);
+		// B_d[y*width+x] = c11 * A_d[(i - 1)*NJ + (j - 1)]  +  c12 * A_d[(i + 0)*NJ + (j - 1)]  +  c13 * A_d[(i + 1)*NJ + (j - 1)]
+		// 		+ c21 * A_d[(i - 1)*NJ + (j + 0)]  +  c22 * A_d[(i + 0)*NJ + (j + 0)]  +  c23 * A_d[(i + 1)*NJ + (j + 0)]
+		// 		+ c31 * A_d[(i - 1)*NJ + (j + 1)]  +  c32 * A_d[(i + 0)*NJ + (j + 1)]  +  c33 * A_d[(i + 1)*NJ + (j + 1)];
+
+		B_d[y*width+x] = 1.0;
+	}
 }
 
 void Convolution(double* A, double* B)
@@ -82,7 +93,7 @@ int main(int argc, char *argv[])
 	dim3 dimBlock(1,1);
 
 	// !!! call GPU kernel
-	convolutionKernel<<<dimGrid, dimBlock>>>(A_d, B_d);
+	convolutionKernel<<<dimGrid, dimBlock>>>(A_d, B_d, NJ, NI);
 
 	// transer matrix B from device to Host
 	cudaMemcpy(B_h, B_d, size, cudaMemcpyDeviceToHost);
