@@ -4,8 +4,8 @@
 #include <sys/time.h>
 
 /* Problem size */
-#define NI 4096
-#define NJ 4096
+#define NI 64 //4096
+#define NJ 64 //4096
 
 void Convolution(double* A, double* B)
 {
@@ -20,7 +20,7 @@ void Convolution(double* A, double* B)
 	for (i = 1; i < NI - 1; ++i) {
 		for (j = 1; j < NJ - 1; ++j) {
 			B[i*NJ + j] = c11 * A[(i - 1)*NJ + (j - 1)]  +  c12 * A[(i + 0)*NJ + (j - 1)]  +  c13 * A[(i + 1)*NJ + (j - 1)]
-				    + c21 * A[(i - 1)*NJ + (j + 0)]  +  c22 * A[(i + 0)*NJ + (j + 0)]  +  c23 * A[(i + 1)*NJ + (j + 0)] 
+				    + c21 * A[(i - 1)*NJ + (j + 0)]  +  c22 * A[(i + 0)*NJ + (j + 0)]  +  c23 * A[(i + 1)*NJ + (j + 0)]
 				    + c31 * A[(i - 1)*NJ + (j + 1)]  +  c32 * A[(i + 0)*NJ + (j + 1)]  +  c33 * A[(i + 1)*NJ + (j + 1)];
 		}
 	}
@@ -43,21 +43,35 @@ int main(int argc, char *argv[])
 	double		*B;
 	struct timeval	cpu_start, cpu_end;
 
-	
+	// open file
+	FILE *output;
+	output = fopen("results.out", "w");
+	if (output == NULL) {
+		printf("Could not open file \"spacetime.out\"");
+		exit(1);
+	}
+
+
 	A = (double*)malloc(NI*NJ*sizeof(double));
 	B = (double*)malloc(NI*NJ*sizeof(double));
 
 	//initialize the arrays
 	init(A);
-	
+
 	gettimeofday(&cpu_start, NULL);
 	Convolution(A, B);
 	gettimeofday(&cpu_end, NULL);
 	fprintf(stdout, "CPU Runtime: %0.6lfs\n", ((cpu_end.tv_sec - cpu_start.tv_sec) * 1000000.0 + (cpu_end.tv_usec - cpu_start.tv_usec)) / 1000000.0);
-	
+
+	// write results to file
+	for (int i = 0; i < NI*NJ; i++)
+	{
+		fprintf(output, "%19.15f\n", B[i]);
+	}
+
 	free(A);
 	free(B);
-	
+	fclose(output);
+
 	return 0;
 }
-
