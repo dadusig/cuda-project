@@ -7,6 +7,11 @@
 #define NI 64 //4096
 #define NJ 64 //4096
 
+__global__ convolutionKernel(double *A_d, double *B_d)
+{
+	// kernel code goes here
+}
+
 void Convolution(double* A, double* B)
 {
 	int i, j;
@@ -39,18 +44,24 @@ void init(double* A)
 
 int main(int argc, char *argv[])
 {
-	double		*A;
-	double		*B;
-	struct timeval	cpu_start, cpu_end;
-
 	// open file
 	FILE *output;
 	output = fopen("results.out", "w");
 	if (output == NULL) {
-		printf("Could not open file \"spacetime.out\"");
+		printf("Could not open file");
 		exit(1);
 	}
 
+	double		*A_h;
+	double		*B_h;
+	struct timeval	cpu_start, cpu_end;
+
+	// create matrices in device
+	double *A_d, *B_d;
+	// allocate memory in device
+	int size = NI*NJ;
+	cudaMalloc((void**) &A_d, size);
+	cudaMalloc((void**) &B_d, size);
 
 	A = (double*)malloc(NI*NJ*sizeof(double));
 	B = (double*)malloc(NI*NJ*sizeof(double));
@@ -58,10 +69,23 @@ int main(int argc, char *argv[])
 	//initialize the arrays
 	init(A);
 
-	gettimeofday(&cpu_start, NULL);
-	Convolution(A, B);
-	gettimeofday(&cpu_end, NULL);
-	fprintf(stdout, "CPU Runtime: %0.6lfs\n", ((cpu_end.tv_sec - cpu_start.tv_sec) * 1000000.0 + (cpu_end.tv_usec - cpu_start.tv_usec)) / 1000000.0);
+	// transfer matrix A to device
+	cudaMemcpy(A_d, A_h, size, cudaMemcpyHostToDevice);
+
+	// gettimeofday(&cpu_start, NULL);
+	// Convolution(A, B);
+	// gettimeofday(&cpu_end, NULL);
+	// fprintf(stdout, "CPU Runtime: %0.6lfs\n", ((cpu_end.tv_sec - cpu_start.tv_sec) * 1000000.0 + (cpu_end.tv_usec - cpu_start.tv_usec)) / 1000000.0);
+
+	// !!! set grid and block dimensions
+	dim3 dimGrid(1,1);
+	dim3 dimBlock(1,1);
+
+	// !!! call GPU kernel
+	convolutionKernel<<<dimGrid, dimBlock>>(A_d, B_d);
+
+	// transer matrix B from device to Host
+	cudaMemcpy(B_h, C_d, size, cudaMemcpyDeviceToHost);
 
 	// write results to file
 	for (int i = 0; i < NI*NJ; i++)
