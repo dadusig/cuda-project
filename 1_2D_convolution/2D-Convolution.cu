@@ -4,8 +4,8 @@
 #include <sys/time.h>
 
 /* Problem size */
-#define NI 32 //4096 // height
-#define NJ 32 //4096 // width
+#define NI 4096 // height
+#define NJ 4096 // width
 
 __global__ void convolutionKernel(double *A_d, double *B_d, int width, int height)
 {
@@ -81,7 +81,7 @@ int main(int argc, char *argv[])
 {
 	// open file
 	FILE *output;
-	output = fopen("results.out", "w");
+	output = fopen("gpu.out", "w");
 	if (output == NULL) {
 		printf("Could not open file");
 		exit(1);
@@ -127,7 +127,7 @@ int main(int argc, char *argv[])
 	cudaMemcpy(B_d, B_h, size, cudaMemcpyHostToDevice);
 
 	// !!! set grid and block dimensions
-	dim3 dimGrid(1,1);
+	dim3 dimGrid(128,128);
 	dim3 dimBlock(32,32);
 
 	// call GPU kernel
@@ -140,16 +140,24 @@ int main(int argc, char *argv[])
 	cudaEventSynchronize(stop);
 	float milliseconds = 0;
 	cudaEventElapsedTime(&milliseconds, start, stop);
-	printf("GPU Runtime: %0.6lfs\n", milliseconds);
+	printf("GPU Runtime: %0.6lfs\n", milliseconds/1000.0);
 
 	/* print kernel result */
 	// printf("\nB kernel result:");
 	// print_matrix(B_h, NJ, NI);
 
 	// write results to file
-	for (int i = 0; i < NI*NJ; i++)
-	{
-		fprintf(output, "%19.15f\n", B_h[i]);
+	// for (int i = 0; i < NI*NJ; i++)
+	// {
+	// 	if(i%NJ==0)
+	// 	fprintf(output, "%19.15f\n", B_h[i]);
+	// }
+	for (int i = 1; i < NI - 1; ++i) {
+		for (int j = 1; j < NJ - 1; ++j) {
+			//B[i*NJ + j]
+			if(i%NJ/2==0)
+			fprintf(output, "%19.15f\n", B_h[i*NJ + j]);
+		}
 	}
 
 	/* 	for validation purposes

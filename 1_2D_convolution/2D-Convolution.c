@@ -4,8 +4,8 @@
 #include <sys/time.h>
 
 /* Problem size */
-#define NI 32 //4096
-#define NJ 32 //4096
+#define NI 4096
+#define NJ 4096
 
 void Convolution(double* A, double* B)
 {
@@ -45,7 +45,7 @@ int main(int argc, char *argv[])
 
 	// open file
 	FILE *output;
-	output = fopen("results.out", "w");
+	output = fopen("cpu.out", "w");
 	if (output == NULL) {
 		printf("Could not open file \"spacetime.out\"");
 		exit(1);
@@ -64,9 +64,17 @@ int main(int argc, char *argv[])
 	fprintf(stdout, "CPU Runtime: %0.6lfs\n", ((cpu_end.tv_sec - cpu_start.tv_sec) * 1000000.0 + (cpu_end.tv_usec - cpu_start.tv_usec)) / 1000000.0);
 
 	// write results to file
-	for (int i = 0; i < NI*NJ; i++)
-	{
-		fprintf(output, "%19.15f\n", B[i]);
+	// for (int i = 0; i < NI*NJ; i++)
+	// {
+	// 	if(i%NJ==0)
+	// 	fprintf(output, "%19.15f\n", B[i]);
+	// }
+	for (int i = 1; i < NI - 1; ++i) {
+		for (int j = 1; j < NJ - 1; ++j) {
+			//B[i*NJ + j]
+			if(i%NJ/2==0)
+			fprintf(output, "%19.15f\n", B[i*NJ + j]);
+		}
 	}
 
 	free(A);
