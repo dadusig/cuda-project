@@ -4,8 +4,8 @@
 #include <sys/time.h>
 
 /* Problem size */
-#define NI 4 //4096 // height
-#define NJ 4 //4096 // width
+#define NI 8 //4096 // height
+#define NJ 8 //4096 // width
 
 __global__ void convolutionKernel(double *A_d, double *B_d, int width, int height)
 {
@@ -47,7 +47,7 @@ void print_matrix(double* C, int width, int height)
 		for (int j = 0; j < width; j++)
 		{
 			//printf("(%d, %d) -> %d\t", i, j, C[i*width+j]);
-			printf("%3.2f   ", C[i*width+j]);
+			printf("%- 3.2f   ", C[i*width+j]);
 		}
 		printf("%s\n", " ");
 	}
@@ -138,7 +138,7 @@ int main(int argc, char *argv[])
 
 	// transfer matrix A to device
 	cudaMemcpy(A_d, A_h, size, cudaMemcpyHostToDevice);
-	cudaMemcpy(B_d, B_h, size, cudaMemcpyHostToDevice);
+	//cudaMemcpy(B_d, B_h, size, cudaMemcpyHostToDevice);
 
 	// gettimeofday(&cpu_start, NULL);
 	// Convolution(A, B);
@@ -147,7 +147,7 @@ int main(int argc, char *argv[])
 
 	// !!! set grid and block dimensions
 	dim3 dimGrid(1,1);
-	dim3 dimBlock(4,4);
+	dim3 dimBlock(8,8);
 
 	// !!! call GPU kernel
 	convolutionKernel<<<dimGrid, dimBlock>>>(A_d, B_d, NJ, NI);
