@@ -4,8 +4,8 @@
 #include <sys/time.h>
 
 /* Problem size */
-#define NI 64 //4096
-#define NJ 64 //4096
+#define NI 32 //4096
+#define NJ 32 //4096
 
 void Convolution(double* A, double* B)
 {
