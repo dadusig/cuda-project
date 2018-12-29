@@ -87,6 +87,10 @@ int main(int argc, char *argv[])
 		exit(1);
 	}
 
+	cudaEvent_t start, stop;
+	cudaEventCreate(&start);
+	cudaEventCreate(&stop);
+
 	double		*A_h;
 	double		*B_h;
 
@@ -127,10 +131,16 @@ int main(int argc, char *argv[])
 	dim3 dimBlock(32,32);
 
 	// call GPU kernel
+	cudaEventRecord(start);
 	convolutionKernel<<<dimGrid, dimBlock>>>(A_d, B_d, NJ, NI);
+	cudaEventRecord(stop);
 
 	// transer matrix B from DEVICE to HOST
 	cudaMemcpy(B_h, B_d, size, cudaMemcpyDeviceToHost);
+	cudaEventSynchronize(stop);
+	float milliseconds = 0;
+	cudaEventElapsedTime(&milliseconds, start, stop);
+	printf("GPU Runtime: %0.6lfs\n", milliseconds);
 
 	/* print kernel result */
 	// printf("\nB kernel result:");
