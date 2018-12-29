@@ -61,7 +61,7 @@ int main(int argc, char *argv[])
 	gettimeofday(&cpu_start, NULL);
 	Convolution(A, B);
 	gettimeofday(&cpu_end, NULL);
-	fprintf(stdout, "CPU Runtime: %0.6lfs\n", ((cpu_end.tv_sec - cpu_start.tv_sec) * 1000000.0 + (cpu_end.tv_usec - cpu_start.tv_usec)) / 1000000.0);
+	fprintf(stdout, "CPU Runtime: %0.6lf sec\n", ((cpu_end.tv_sec - cpu_start.tv_sec) * 1000000.0 + (cpu_end.tv_usec - cpu_start.tv_usec)) / 1000000.0);
 
 	// write results to file
 	// for (int i = 0; i < NI*NJ; i++)
@@ -69,7 +69,7 @@ int main(int argc, char *argv[])
 	// 	if(i%NJ==0)
 	// 	fprintf(output, "%19.15f\n", B[i]);
 	// }
-	
+
 	for (int i = 1; i < NI - 1; ++i) {
 		for (int j = 1; j < NJ - 1; ++j) {
 			//B[i*NJ + j]

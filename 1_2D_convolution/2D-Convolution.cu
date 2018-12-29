@@ -33,6 +33,15 @@ __global__ void convolutionKernel(double *A_d, double *B_d, int width, int heigh
 	}
 }
 
+int my_ceil(float num)
+{
+    int inum = (int)num;
+    if (num == (float)inum) {
+        return inum;
+    }
+    return inum + 1;
+}
+
 void print_matrix(double* C, int width, int height)
 {
 	printf("%s\n", " ");
@@ -127,8 +136,23 @@ int main(int argc, char *argv[])
 	cudaMemcpy(B_d, B_h, size, cudaMemcpyHostToDevice);
 
 	// !!! set grid and block dimensions
-	dim3 dimGrid(512,512);
-	dim3 dimBlock(16,16);
+
+	// calculate grid dimensions given block size = 16x16
+
+	// given block size
+	int block_dim_x = 16;
+	int block_dim_y = 16;
+
+	//calculate grid dimensions
+	int grid_dim_x = my_ceil( (float) NJ / block_dim_x);
+	int grid_dim_y = my_ceil( (float) NI / block_dim_y);
+
+	printf("Block Size = %dx%d\n", block_dim_x, block_dim_y);
+	printf("Calculated Grid Size = %dx%d\n", grid_dim_x, grid_dim_y);
+
+	//         width, height
+	dim3 dimGrid(grid_dim_x, grid_dim_x);
+	dim3 dimBlock(block_dim_x, block_dim_y);
 
 	// call GPU kernel
 	cudaEventRecord(start);
@@ -142,7 +166,7 @@ int main(int argc, char *argv[])
 	cudaEventElapsedTime(&milliseconds, start, stop);
 	cudaEventDestroy(start);
 	cudaEventDestroy(stop);
-	printf("GPU Runtime: %0.6lfs\n", milliseconds/1000.0);
+	printf("GPU Runtime: %0.6lf sec\n", milliseconds/1000.0);
 
 	/* print kernel result */
 	// printf("\nB kernel result:");
