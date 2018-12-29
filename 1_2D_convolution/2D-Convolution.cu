@@ -4,8 +4,8 @@
 #include <sys/time.h>
 
 /* Problem size */
-#define NI 4096 // height
-#define NJ 4096 // width
+#define NI 8192 // height
+#define NJ 8192 // width
 
 __global__ void convolutionKernel(double *A_d, double *B_d, int width, int height)
 {
@@ -102,7 +102,7 @@ int main(int argc, char *argv[])
 	double *A_d;
 	double *B_d;
 	// allocate memory in device
-	int size = NI*NJ*sizeof(double);
+	long size = NI*NJ*sizeof(double);
 	cudaMalloc((void**) &A_d, size);
 	cudaMalloc((void**) &B_d, size);
 
@@ -127,8 +127,8 @@ int main(int argc, char *argv[])
 	cudaMemcpy(B_d, B_h, size, cudaMemcpyHostToDevice);
 
 	// !!! set grid and block dimensions
-	dim3 dimGrid(128,128);
-	dim3 dimBlock(32,32);
+	dim3 dimGrid(512,512);
+	dim3 dimBlock(16,16);
 
 	// call GPU kernel
 	cudaEventRecord(start);
@@ -140,6 +140,8 @@ int main(int argc, char *argv[])
 	cudaEventSynchronize(stop);
 	float milliseconds = 0;
 	cudaEventElapsedTime(&milliseconds, start, stop);
+	cudaEventDestroy(start);
+	cudaEventDestroy(stop);
 	printf("GPU Runtime: %0.6lfs\n", milliseconds/1000.0);
 
 	/* print kernel result */

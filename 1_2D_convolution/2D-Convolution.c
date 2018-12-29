@@ -4,8 +4,8 @@
 #include <sys/time.h>
 
 /* Problem size */
-#define NI 4096
-#define NJ 4096
+#define NI 8192
+#define NJ 8192
 
 void Convolution(double* A, double* B)
 {
@@ -69,6 +69,7 @@ int main(int argc, char *argv[])
 	// 	if(i%NJ==0)
 	// 	fprintf(output, "%19.15f\n", B[i]);
 	// }
+	
 	for (int i = 1; i < NI - 1; ++i) {
 		for (int j = 1; j < NJ - 1; ++j) {
 			//B[i*NJ + j]
