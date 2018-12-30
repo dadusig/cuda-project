@@ -17,29 +17,35 @@ void init_array(double *x, double *A)
 {
 	int i, j;
 
-	for (i = 0; i < NX; i++) {
-		x[i] = i * M_PI;
-		for (j = 0; j < NY; j++) {
+	for (i = 0; i < NX; i++)
+	{
+		for (j = 0; j < NY; j++)
+		{
 			A[i*NY + j] = ((double) i*(j)) / NX;
 		}
+	}
+
+	for (j = 0; j < NY; j++)
+	{
+		x[j] = j * M_PI;
 	}
 }
 
 void trans_norm_vector(double* A, double* x, double* y, double* tmp)
 {
 	int i,j;
-	
+
 	for (i= 0; i < NY; i++) {
     	y[i] = 0;
 	}
-  
+
 	for (i = 0; i < NX; i++) {
       		tmp[i] = 0;
 
 	      	for (j = 0; j < NY; j++) {
 			tmp[i] = tmp[i] + A[i*NY + j] * x[j];
 		}
-		
+
 	      	for (j = 0; j < NY; j++) {
 			y[j] = y[j] + A[i*NY + j] * tmp[i];
 		}
@@ -73,4 +79,3 @@ int main(int argc, char *argv[])
 
   	return 0;
 }
-
