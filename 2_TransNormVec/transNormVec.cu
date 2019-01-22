@@ -27,8 +27,9 @@
 #define M_PI 3.14159
 //#endif
 
+void print_matrix(double* C, int width, int height);
 
-__global__ void matvec_kernelROWMAJOR(const double * __restrict__ A_d, const double * __restrict__ x_d, double * __restrict__ y_d, const unsigned int rows, const unsigned int cols)
+__global__ void matvec_kernel_row_major(const double* RESTRICT A_d, const double* RESTRICT x_d, double* RESTRICT y_d, const unsigned int rows, const unsigned int cols)
 {
     const unsigned int tid = threadIdx.x + blockIdx.x * blockDim.x;
 
@@ -37,8 +38,6 @@ __global__ void matvec_kernelROWMAJOR(const double * __restrict__ A_d, const dou
 	double y_val = 0.0;
 
 	unsigned int numBlocks = (cols + BLOCK_SIZE - 1) / BLOCK_SIZE;
-
-
 
 	#pragma unroll
 	for (unsigned int m = 0; m < numBlocks; m++)
@@ -64,13 +63,15 @@ __global__ void matvec_kernelROWMAJOR(const double * __restrict__ A_d, const dou
 		__syncthreads();
 
 		if (tid < rows)
+		{
 			y_d[tid] = y_val;
+		}
 
 	}
 
 }
 
-__host__ float matvecROWMAJOR(const double* RESTRICT dA, const double* RESTRICT dx, double* RESTRICT dy, const unsigned int nRows, const unsigned int nx)
+__host__ float matvec_ROW_MAJOR(const double* RESTRICT A_d, const double* RESTRICT x_d, double* RESTRICT y_d, const unsigned int nRows, const unsigned int nCols)
 {
 
 	dim3 dim_grid(((nRows + BLOCK_SIZE - 1) / BLOCK_SIZE));
@@ -81,7 +82,7 @@ __host__ float matvecROWMAJOR(const double* RESTRICT dA, const double* RESTRICT 
 	cudaEventCreate(&stop);
 
 	cudaEventRecord(start);
-	matvec_kernelROWMAJOR<<<dim_grid, dim_block>>>(dA, dx, dy, nRows, nx);
+	matvec_kernel_row_major<<<dim_grid, dim_block>>>(A_d, x_d, y_d, nRows, nCols);
 	cudaEventRecord(stop);
 	cudaEventSynchronize(stop);
 
@@ -93,10 +94,7 @@ __host__ float matvecROWMAJOR(const double* RESTRICT dA, const double* RESTRICT 
 
 }
 
-
-void print_matrix(double* C, int width, int height);
-
-float calculateUsingBLAS(double *A_d, double *x_d, double *Ax_d)
+__host__ float calculateUsingBLAS(double *A_d, double *x_d, double *Ax_d)
 {
 	double alf = 1.0;
 	double beta = 0.0;
@@ -121,41 +119,47 @@ float calculateUsingBLAS(double *A_d, double *x_d, double *Ax_d)
 
 
 
-__global__ void matvec_kernel(const double* RESTRICT  dA, const double* RESTRICT  dx, double* RESTRICT dy,
-const unsigned int nRows, const unsigned int nx)
+__global__ void matvec_kernel_column_major(const double* RESTRICT A_d, const double* RESTRICT  x_d, double* RESTRICT y_d, const unsigned int nRows, const unsigned int nCols)
 {
-  const unsigned int tid = threadIdx.x + blockIdx.x * blockDim.x;
 
-  __shared__ double x_shared[BLOCK_SIZE];
+	const unsigned int tid = threadIdx.x + blockIdx.x * blockDim.x;
 
-  double y_val = 0.0;
+	__shared__ double x_shared[BLOCK_SIZE];
 
-  #pragma unroll
-  for (unsigned int m = 0; m < ((nx + BLOCK_SIZE - 1) / BLOCK_SIZE); ++m) {
+	double y_val = 0.0;
 
-    if ((m * BLOCK_SIZE + threadIdx.x) < nx)
-      x_shared[threadIdx.x] = dx[threadIdx.x + m * BLOCK_SIZE];
-    else
-      x_shared[threadIdx.x] = 0.f;
+	#pragma unroll
+	for (unsigned int m = 0; m < ((nCols + BLOCK_SIZE - 1) / BLOCK_SIZE); ++m)
+	{
 
-    __syncthreads();
+		if ((m * BLOCK_SIZE + threadIdx.x) < nCols)
+		{
+			x_shared[threadIdx.x] = x_d[threadIdx.x + m * BLOCK_SIZE];
+		}
+		else
+		{
+			x_shared[threadIdx.x] = 0.f;
+		}
 
-    #pragma unroll
-    for (unsigned int e = 0; e < BLOCK_SIZE; ++e) {
-      y_val += dA[tid + (e + BLOCK_SIZE * m) * nRows] * x_shared[e];
-    }
+		__syncthreads();
 
-    __syncthreads();
-  }
+		#pragma unroll
+		for (unsigned int e = 0; e < BLOCK_SIZE; ++e)
+		{
+			y_val += A_d[tid + (e + BLOCK_SIZE * m) * nRows] * x_shared[e];
+		}
 
-  if (tid < nRows)
-    dy[tid] = y_val;
+		__syncthreads();
+	}
 
-} /* End function matvec_kernel */
+	if (tid < nRows)
+  	{
+    	y_d[tid] = y_val;
+	}
 
+}
 
-//column major
-__host__ float matvec(const double* RESTRICT dA, const double* RESTRICT dx, double* RESTRICT dy, const unsigned int nRows, const unsigned int nx)
+__host__ float matvec_COL_MAJOR(const double* RESTRICT A_d, const double* RESTRICT x_d, double* RESTRICT y_d, const unsigned int nRows, const unsigned int nCols)
 {
 
 	dim3 dim_grid((nRows + BLOCK_SIZE - 1) / BLOCK_SIZE);
@@ -166,7 +170,7 @@ __host__ float matvec(const double* RESTRICT dA, const double* RESTRICT dx, doub
 	cudaEventCreate(&stop);
 
 	cudaEventRecord(start);
-	matvec_kernel<<<dim_grid, dim_block>>>(dA, dx, dy, nRows, nx);
+	matvec_kernel_column_major<<<dim_grid, dim_block>>>(A_d, x_d, y_d, nRows, nCols);
 	cudaEventRecord(stop);
 	cudaEventSynchronize(stop);
 
@@ -177,8 +181,6 @@ __host__ float matvec(const double* RESTRICT dA, const double* RESTRICT dx, doub
 	return milliseconds;
 
 }
-
-
 
 
 void init_array(double *x, double *A)
@@ -203,7 +205,7 @@ void init_array(double *x, double *A)
 
 int main(int argc, char *argv[])
 {
-	cudaDeviceReset();
+	// cudaDeviceReset();
 	// open file
 	FILE *output;
 	output = fopen("gpu.out", "w");
@@ -239,12 +241,11 @@ int main(int argc, char *argv[])
 	/*- copy to device A and x -*/
 	cudaMemcpy(A_d, A_h, 	NX*NY*sizeof(double), cudaMemcpyHostToDevice);
 	cudaMemcpy(x_d, x_h, 	NY*sizeof(double), cudaMemcpyHostToDevice);
-	cudaMemcpy(Ax_d, Ax_h, 	NX*sizeof(double), cudaMemcpyHostToDevice);
-	cudaMemcpy(y_d, y_h, 	NY*sizeof(double), cudaMemcpyHostToDevice);
+	//cudaMemcpy(Ax_d, Ax_h, 	NX*sizeof(double), cudaMemcpyHostToDevice);
+	//cudaMemcpy(y_d, y_h, 	NY*sizeof(double), cudaMemcpyHostToDevice);
 
-	//float milliseconds1 = calculateUsingBLAS(A_d, x_d, Ax_d);
-	float milliseconds1 = matvecROWMAJOR(A_d, x_d, Ax_d, NX, NY);
-	float milliseconds2 = matvec(A_d, Ax_d, y_d, NY, NX);
+	float milliseconds1 = matvec_ROW_MAJOR(A_d, x_d, Ax_d, NX, NY);
+	float milliseconds2 = matvec_COL_MAJOR(A_d, Ax_d, y_d, NY, NX);
 
 	/*- copy back to host desired result -*/
 	cudaMemcpy(y_h, y_d, NY*sizeof(double), cudaMemcpyDeviceToHost);
@@ -257,6 +258,8 @@ int main(int argc, char *argv[])
 			fprintf(output, "%19.15f\n", y_h[i]);
 	}
 
+	float milliseconds_BLAS = calculateUsingBLAS(A_d, x_d, Ax_d);
+	printf("GPU Runtime :%0.6lf sec (on cuBLAS)\n", ((float) (milliseconds_BLAS) / 1000.0));
 
 	/*- free space on both device and host -*/
 	cudaFree(A_d);
@@ -284,6 +287,3 @@ void print_matrix(double* C, int width, int height)
 		printf("%s\n", " ");
 	}
 }
-
-
-// nvcc -o test my_attempt.cu mult_kernels.cu transpose_kernel.cu gen_gpu.cu zero_kernels.cu -I./lib/ -I. -arch=sm_20 -lcurand -lm
