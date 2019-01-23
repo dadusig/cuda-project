@@ -12,7 +12,7 @@
 
 /* Problem size. */
 #define NX 16000
-#define NY 16000
+#define NY 32000
 
 #define TILE_DIM 16
 
@@ -251,6 +251,8 @@ int main(int argc, char *argv[])
 	cudaMemcpy(y_h, y_d, NY*sizeof(double), cudaMemcpyDeviceToHost);
 
 	printf("GPU Runtime :%0.6lf sec\n", ((float) (milliseconds1 + milliseconds2) / 1000.0));
+	printf("Kernel 1:%0.6lf sec\n", ((float) (milliseconds1) / 1000.0));
+	printf("Kernel 2:%0.6lf sec\n", ((float) (milliseconds2) / 1000.0));
 
 	printf("%s\n", "Writing results to gpu.out...");
 	for (int i = 0; i < NY; ++i)

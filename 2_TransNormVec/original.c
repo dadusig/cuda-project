@@ -6,8 +6,8 @@
 #include <sys/time.h>
 
 /* Problem size. */
-#define NX 16000
-#define NY 16000
+#define NX 4096
+#define NY 4096
 
 #ifdef M_PI
 #undef M_PI
