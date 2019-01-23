@@ -16,8 +16,8 @@
 #define GPU_DEVICE 0
 
 /* Problem size */
-#define M 1024
-#define N 1024
+#define M 1000
+#define N 500
 
 /* Thread block dimensions for kernel 1*/
 #define DIM_THREAD_BLOCK_KERNEL_1_X 128
@@ -158,22 +158,22 @@ __global__ void covar_kernel(double *symmat, double *data)
 	int j1 = blockIdx.x * blockDim.x + threadIdx.x + 1;
 	int i, j2;
 
-	double test = 0.0;
+	double local_res = 0.0;
 
 	if ((j1 >= 1) && (j1 < (M+1)))
 	{
 		for (j2 = j1; j2 < (M+1); j2++)
 		{
 			//symmat[j1*(M+1) + j2] = 0.0;
-			test = 0.0;
+			local_res = 0.0;
 			for(i = 1; i < (N+1); i++)
 			{
 				// symmat[j1 * (M+1) + j2] += data[i *(M+1) + j1] * data[i *(M+1) + j2];
-				test += data[i *(M+1) + j1] * data[i *(M+1) + j2];
+				local_res += data[i *(M+1) + j1] * data[i *(M+1) + j2];
 			}
 			// symmat[j2 * (M+1) + j1] = symmat[j1 * (M+1) + j2];
-			symmat[j1 * (M+1) + j2] = test;
-			symmat[j2 * (M+1) + j1] = test;
+			symmat[j1 * (M+1) + j2] = local_res;
+			symmat[j2 * (M+1) + j1] = local_res;
 		}
 	}
 }
@@ -236,10 +236,12 @@ void calculate_on_GPU(double* data, double* symmat, double* mean, double* symmat
 int main()
 {
 	// open file
-	FILE *output;
-	output = fopen("gpu.out", "w");
-	if (output == NULL) {
-		printf("Could not open file \"gpu.out\"");
+	FILE *output1;
+	FILE *output2;
+	output1 = fopen("gpu.out", "w");
+	output2 = fopen("cpu.out", "w");
+	if (output1 == NULL || output2 == NULL) {
+		printf("Could not open output file!");
 		exit(1);
 	}
 
@@ -267,18 +269,22 @@ int main()
 
 	compareResults(symmat_h, symmat_outputFromGpu_h);
 
-	for (int i = 1; i < M+1; ++i) {
-		for (int j = 1; j < M+1; ++j) {
-			if(i%10==0)
-			fprintf(output, "%19.15f\n", symmat_outputFromGpu_h[i*(M+1) + j]);
-		}
-	}
+	// for (int i = 1; i < M+1; ++i) {
+	// 	for (int j = 1; j < M+1; ++j) {
+	// 		if(i%10==0)
+	// 		{
+	// 			fprintf(output1, "%19.15f\n", symmat_outputFromGpu_h[i*(M+1) + j]);
+	// 			fprintf(output2, "%19.15f\n",               symmat_h[i*(M+1) + j]);
+	// 		}
+	// 	}
+	// }
 
 	free(data_h);
 	free(symmat_h);
 	free(mean_h);
 	free(symmat_outputFromGpu_h);
-	fclose(output);
+	fclose(output1);
+	fclose(output2);
 
   	return 0;
 }
