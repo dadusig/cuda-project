@@ -1,0 +1,38 @@
+\noindent Η εκτέλεση των προγραμμάτων μας έγινε χρησιμοποιώντας τους υπολογιστικούς πόρους που μας διετέθησαν στα πλαίσια του μαθήματος. Συγκεκριμένα η κάρτα γραφικών που αξιοποιήσαμε περιγράφεται από τα παρακάτω τεχνικά χαρακτηριστικά, με \textbf{Compute Capability 2.0}. Επιπρόσθετα η CPU που είχαμε στη διάθεση μας ήταν ενας Intel Xeon E5530 @ 2.40GHz με 8 πυρήνες και 8KB L3 cache με 12GB διαθέσιμης μνήμης RAM. Στα πλαίσια της εργασίας δεν αξιοποιείται κάποια δυνατότητα παραλληλίας στη CPU.
+
+\begin{verbatim}
+Device 0: "Tesla C2075"
+  CUDA Driver Version / Runtime Version          6.0 / 6.0
+  CUDA Capability Major/Minor version number:    2.0
+  Total amount of global memory:                 5375 MBytes (5636554752 bytes)
+  (14) Multiprocessors, ( 32) CUDA Cores/MP:     448 CUDA Cores
+  GPU Clock rate:                                1147 MHz (1.15 GHz)
+  Memory Clock rate:                             1566 Mhz
+  Memory Bus Width:                              384-bit
+  L2 Cache Size:                                 786432 bytes
+  Maximum Texture Dimension Size (x,y,z)         1D=(65536), 2D=(65536, 65535), 
+                                                 3D=(2048, 2048, 2048)
+  Maximum Layered 1D Texture Size, (num) layers  1D=(16384), 2048 layers
+  Maximum Layered 2D Texture Size, (num) layers  2D=(16384, 16384), 2048 layers
+  Total amount of constant memory:               65536 bytes
+  Total amount of shared memory per block:       49152 bytes
+  Total number of registers available per block: 32768
+  Warp size:                                     32
+  Maximum number of threads per multiprocessor:  1536
+  Maximum number of threads per block:           1024
+  Max dimension size of a thread block (x,y,z): (1024, 1024, 64)
+  Max dimension size of a grid size    (x,y,z): (65535, 65535, 65535)
+  Maximum memory pitch:                          2147483647 bytes
+  Texture alignment:                             512 bytes
+  Concurrent copy and kernel execution:          Yes with 2 copy engine(s)
+  Run time limit on kernels:                     No
+  Integrated GPU sharing Host Memory:            No
+  Support host page-locked memory mapping:       Yes
+  Alignment requirement for Surfaces:            Yes
+  Device has ECC support:                        Enabled
+  Device supports Unified Addressing (UVA):      Yes
+  Device PCI Bus ID / PCI location ID:           66 / 0
+
+\end{verbatim}
+
+Για την χρονομέτρηση των υπολογιστικών πυρήνων (kernels) χρησιμοποιούμε τα κατάλληλα cuda events που μας παρέχονται από τις βιβλιοθήκες της CUDA. Αν χρησιμοποιούσαμε κάποια λύση που βασίζεται σε βιβλιοθήκες που μας προσφέρει ο host, χωρίς την χρήση κάποιου επιπλέον ρητού συγχρονισμού θα μετράγαμε τον χρόνο εκκίνησης του υπολογιστικού πυρήνα και όχι τον χρόνο εκτέλεσής του, καθώς η εκτέλεση του kernel στην GPU είναι ασύγχρονη ως προς την υπόλοιπη ροή του προγράμματος στη CPU \cite{Harris:metrics}. Τέλος, τον παραδοτέο κώδικα συνοδεύουν κάποια απλουστευμένα Makefiles, ανεξάρτητα για κάθε ερώτημα, για την πιο εύκολη μεταγλώττισή του.

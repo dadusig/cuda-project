@@ -1,0 +1,54 @@
+\documentclass[a4paper,oneside,titlepage,10pt]{article}
+
+
+\input{preamble.tex}
+
+\begin{document}
+
+\input{cover}
+
+\newpage
+
+\lstset{basicstyle=\large,style=myCustomMatlabStyle}
+\color{black}
+
+\setlength{\parskip}{10pt}
+ \pagecolor{white} 
+ 
+ \tableofcontents
+\newpage
+ 
+\setcounter{section}{-1}
+ 
+\section{Τεχνικά Χαρακτηριστικά}
+\input{0_tech_specs}
+
+\newpage
+
+\section{2D Convolution}
+\input{1_2d_conv}
+
+\section{y = A\textsuperscript{T} {$\cdot$} A {$\cdot$} x}
+\input{2_multiplication}
+
+\section{Covariance}
+\input{3_covariance}
+
+\newpage
+
+\section{Google Cloud Platform}
+\input{4_gcp.tex}
+
+\newpage
+
+\bibliography{cuda} 
+\addcontentsline{toc}{section}{Αναφορές}
+\bibliographystyle{IEEEtran}
+
+\end{document}
+
+
+
+
+%kernel/system/do_fork.c
+

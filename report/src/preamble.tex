@@ -1,0 +1,209 @@
+\usepackage{xltxtra}
+\usepackage{xgreek}
+\setmainfont[Mapping=tex-text]{Calibri.ttf} %Courier New for programing
+\usepackage{amsfonts}
+\usepackage{listings}
+
+
+
+%\setmainfont[Mapping=tex-text]{Helvetica}
+\setmainfont[Mapping=tex-text]{Calibri.ttf}
+\setmainfont[
+ BoldFont={CALIBRIB.TTF}, 
+ ItalicFont={CALIBRII.TTF},
+ BoldItalicFont={CALIBRIZ.TTF}
+ ]{Calibri.ttf}
+ 
+ \usepackage{amsmath}
+
+\usepackage{alltt}
+
+
+
+\usepackage[margin=1in]{geometry}
+
+% \usepackage[hidelinks]{hyperref}
+
+%\usepackage[]{hyperref}
+
+ \usepackage[colorlinks = true,
+             linkcolor = black,
+             urlcolor  = blue,
+             citecolor = blue,
+            anchorcolor = blue]{hyperref}
+
+\usepackage{enumitem}
+
+
+%\usepackage[LGR]{fontenc}
+
+%\renewcommand{\familydefault}{\sfdefault}
+
+
+
+\usepackage{graphicx,wrapfig}
+\graphicspath{ {images/} }
+
+\usepackage[usenames, dvipsnames]{color}
+\definecolor{mygray}{gray}{0.6}
+
+\usepackage[table,xcdraw]{xcolor}
+
+\definecolor{calpolypomonagreen}{rgb}{0.07, 0.53, 0.03}
+
+
+\usepackage{listings}
+
+\lstdefinelanguage{diff}{
+  morecomment=[f][\color{blue}]{@@},     % group identifier
+  morecomment=[f][\color{red}]-,         % deleted lines 
+  morecomment=[f][\color{calpolypomonagreen}]+,       % added lines
+  morecomment=[f][\color{magenta}]{---}, % Diff header lines (must appear after +,-)
+  morecomment=[f][\color{magenta}]{+++},
+}
+
+\lstdefinelanguage{diffrrr}{
+  sensitive=true,
+  % diff command line
+  morecomment=[f][\color{gray}][0]{diff},
+  % commit identifiers for git diff
+  morecomment=[f][\color{gray}][0]{index},
+  % hunk location/line numbers for unified format
+  morecomment=[f][\color{blue}][0]{@@},
+  % hunk location/line numbers for context format
+  morecomment=[f][\color{magenta}][0]{***},
+  % changed line for context format
+  morecomment=[f][\color{violet}][0]{!},
+  % deleted lines for unified format
+  morecomment=[f][\color{red!60!black}][0]-,
+  % added lines for unified format
+  morecomment=[f][\color{green!60!black}][0]+,
+  % file name and time stamp old file
+  morecomment=[f][\color{magenta}][0]{---},
+  % file name and time stamp new file
+  morecomment=[f][\color{magenta}][0]{+++},
+  % Binary files ... differ
+  morecomment=[f][\color{gray}][0]{Binary},
+  % Only in ...: file.txt
+  morecomment=[f][\color{gray}][0]{Only},
+  % old mode ...
+  morecomment=[f][\color{gray}][0]{old},
+  % new mode ...
+  morecomment=[f][\color{gray}][0]{new},
+  % rename from/to ...
+  morecomment=[f][\color{gray}][0]{rename},
+  % similarity index ...%
+  morecomment=[f][\color{gray}][0]{similarity},
+  % deleted file mode ...%
+  morecomment=[f][\color{gray}][0]{deleted},
+  % hunk separator for context format
+  morecomment=[f][\color{magenta}][0]{***************},
+  % deleted lines for normal format
+  morecomment=[f][\color{red!60!black}][0]<,
+  % added lines for normal format
+  morecomment=[f][\color{green!60!black}][0]>,
+  % line number specifier for normal format
+  morecomment=[f][\color{blue}][0]{0},
+  % line number specifier for normal format
+  morecomment=[f][\color{blue}][0]{1},
+  % line number specifier for normal format
+  morecomment=[f][\color{blue}][0]{2},
+  % line number specifier for normal format
+  morecomment=[f][\color{blue}][0]{3},
+  % line number specifier for normal format
+  morecomment=[f][\color{blue}][0]{4},
+  % line number specifier for normal format
+  morecomment=[f][\color{blue}][0]{5},
+  % line number specifier for normal format
+  morecomment=[f][\color{blue}][0]{6},
+  % line number specifier for normal format
+  morecomment=[f][\color{blue}][0]{7},
+  % line number specifier for normal format
+  morecomment=[f][\color{blue}][0]{8},
+  % line number specifier for normal format
+  morecomment=[f][\color{blue}][0]{9},
+}[comments]
+
+\definecolor{verbgray}{gray}{0.93}
+
+
+
+
+\lstdefinestyle{myCustomMatlabStyle}{
+  language=diff,
+  backgroundcolor=\color{verbgray},
+  stepnumber=1,
+  numbersep=10pt,
+  tabsize=4,
+  showspaces=false,
+  keepspaces=true,
+  showstringspaces=false,
+  frame=single,
+  framerule=0pt,
+  columns=fullflexible,
+  basicstyle=\ttfamily\footnotesize
+}
+
+\lstdefinestyle{myCustomCStyle}{
+  language=C,
+  backgroundcolor=\color{verbgray},
+  stepnumber=1,
+  numbersep=10pt,
+  tabsize=4,
+  showspaces=false,
+  showstringspaces=false,
+  frame=single,
+  framerule=0pt,
+  columns=fullflexible,
+  basicstyle=\ttfamily\footnotesize
+}
+
+\lstdefinestyle{CStyle}{
+    backgroundcolor=\color{verbgray},   
+    commentstyle=\color{green},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{gray}\ttfamily,
+    numbers=left,
+    stringstyle=\color{purple},
+    basicstyle=\ttfamily\small,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=4,
+    columns=fullflexible,
+                keywordstyle=\color{blue}\ttfamily,
+                stringstyle=\color{red}\ttfamily,
+                commentstyle=\color{calpolypomonagreen}\ttfamily,
+                morecomment=[l][\color{magenta}]{\#}
+    language=C
+}
+
+\lstdefinestyle{bash}{
+    backgroundcolor=\color{black},   
+    commentstyle=\color{white},
+    keywordstyle=\color{white},
+    stringstyle=\color{white},
+    basicstyle=\ttfamily\color{white}\small,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    %captionpos=b,                    
+    keepspaces=true,                 
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=4,
+    linewidth=15cm,
+    language=C
+    %columns=fullflexible,
+}
+
+\usepackage{afterpage}
+\usepackage{pagecolor}
+\usepackage{titlesec}
+\titlelabel{\thetitle.\quad}
+
+\usepackage{hyperref}
