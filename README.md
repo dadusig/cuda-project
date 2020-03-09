@@ -7,4 +7,6 @@ The scope of the project is divided into the following three calculations:
 - Matrix Vector Multiplication
 - Covariance Matrix
 
+Keeping performance and accuracy in mind, we compared the results of our custom implementation with the results of CUDA's built in linear algebra package cuBLAS as well as with open source alternatives like openBLAS and kblas-gpu. In terms of hardware, we ran our software both at the machines available at the HPC Lab as well as at the cloud using the GPUs compute engine environment provided by Google Cloud Platform.
+
 For a more detailed explanation please checkout the project's report file located in **report/main.pdf** (in greek)
